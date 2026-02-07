@@ -1,0 +1,668 @@
+# UI/UX Patterns - Technical Implementations
+# Common patterns with code-level specifications
+# Based on: Benji.org, Vercel Guidelines, Apple HIG
+
+version: "1.0"
+meta:
+  philosophy: "Simplicity, Fluidity, Delight (Benji.org three pillars)"
+  target: "Production-ready code for React/Swift/TypeScript"
+
+# =============================================================================
+# NAVIGATION PATTERNS
+# =============================================================================
+
+navigation:
+  principle: "We fly instead of teleport - directional motion indicates spatial relationships"
+
+  page_transitions:
+    forward:
+      description: "Moving deeper into hierarchy"
+      animation: "slide-left"
+      duration: 300
+      easing: "ease-out"
+
+      implementation: |
+        @keyframes slide-left {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+    backward:
+      description: "Moving up hierarchy"
+      animation: "slide-right"
+      duration: 300
+      easing: "ease-out"
+
+      implementation: |
+        @keyframes slide-right {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+  tab_navigation:
+    principle: "Contextual directional slides based on tab position"
+
+    implementation: |
+      // React example with Framer Motion
+      const variants = {
+        enter: (direction: number) => ({
+          x: direction > 0 ? 100 : -100,
+          opacity: 0
+        }),
+        center: {
+          x: 0,
+          opacity: 1
+        },
+        exit: (direction: number) => ({
+          x: direction > 0 ? -100 : 100,
+          opacity: 0
+        })
+      }
+
+  tray_system:
+    description: "Benji.org tray transitions with height variations"
+    principle: "Visual progression through expanding/collapsing containers"
+
+    states:
+      collapsed:
+        height: "auto"
+        overflow: "hidden"
+
+      expanded:
+        height: "auto"  # Let content dictate
+        overflow: "visible"
+
+    animation:
+      duration: 400
+      easing: "ease-in-out"
+      property: "transform: scaleY()"  # Use transform, not height
+
+    implementation: |
+      .tray {
+        transform-origin: top;
+        transition: transform 400ms ease-in-out;
+      }
+
+      .tray[data-collapsed] {
+        transform: scaleY(0.3);
+      }
+
+      .tray[data-expanded] {
+        transform: scaleY(1);
+      }
+
+# =============================================================================
+# FEEDBACK PATTERNS
+# =============================================================================
+
+feedback:
+  toast_notifications:
+    position: "top-center"
+    max_width: 420
+    padding: 16
+    border_radius: 12
+
+    variants:
+      success:
+        background: "var(--color-success-light)"
+        border: "1px solid var(--color-success)"
+        icon: "check-circle"
+
+      error:
+        background: "var(--color-error-light)"
+        border: "1px solid var(--color-error)"
+        icon: "x-circle"
+
+      warning:
+        background: "var(--color-warning-light)"
+        border: "1px solid var(--color-warning)"
+        icon: "alert-triangle"
+
+      info:
+        background: "var(--color-info-light)"
+        border: "1px solid var(--color-info)"
+        icon: "info"
+
+    animation:
+      enter:
+        from: "translateY(-100%) opacity(0)"
+        to: "translateY(0) opacity(1)"
+        duration: 300
+        easing: "ease-out"
+
+      exit:
+        from: "translateY(0) opacity(1)"
+        to: "translateY(-100%) opacity(0)"
+        duration: 200
+        easing: "ease-in"
+
+    auto_dismiss: 4000
+    dismissible: true
+
+  modal_dialog:
+    overlay:
+      background: "rgba(0, 0, 0, 0.5)"
+      backdrop_filter: "blur(4px)"
+      animation:
+        duration: 200
+        easing: "ease-out"
+
+    content:
+      max_width: 600
+      max_height: "80vh"
+      padding: 24
+      border_radius: 16
+      background: "var(--color-surface)"
+      box_shadow: "var(--shadow-xl)"
+
+      animation:
+        enter:
+          from: "scale(0.95) opacity(0)"
+          to: "scale(1) opacity(1)"
+          duration: 300
+          easing: "ease-out"
+
+        exit:
+          from: "scale(1) opacity(1)"
+          to: "scale(0.95) opacity(0)"
+          duration: 200
+          easing: "ease-in"
+
+    accessibility:
+      - "Trap focus within modal"
+      - "Escape key to close"
+      - "Click overlay to close"
+      - "Return focus to trigger element on close"
+      - "aria-modal=\"true\""
+      - "role=\"dialog\""
+
+  loading_states:
+    skeleton:
+      principle: "Must mirror final content layout exactly"
+      animation: "shimmer"
+      duration: 1500
+      background: "linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)"
+
+      implementation: |
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+
+        .skeleton {
+          background-size: 200% 100%;
+          animation: shimmer 1500ms linear infinite;
+        }
+
+    spinner:
+      size: 24
+      stroke_width: 2
+      color: "var(--color-primary)"
+      animation: "rotate 1s linear infinite"
+
+      implementation: |
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+    optimistic_ui:
+      principle: "Show expected result immediately, rollback if fails"
+      timeout: 500  # Show spinner if takes longer
+      rollback_duration: 300
+
+      pattern: |
+        // Optimistic update
+        setState(newValue)
+
+        // Async operation
+        try {
+          await api.update(newValue)
+        } catch (error) {
+          // Rollback with animation
+          setState(oldValue)
+          showToast('Update failed', 'error')
+        }
+
+# =============================================================================
+# INPUT PATTERNS
+# =============================================================================
+
+input:
+  text_input:
+    states:
+      default:
+        border: "1px solid var(--color-border)"
+        background: "var(--color-surface)"
+
+      focus:
+        border_color: "var(--color-primary)"
+        outline: "2px solid var(--color-primary-alpha-20)"
+        transition: "all 150ms ease-out"
+
+      error:
+        border_color: "var(--color-error)"
+        outline: "2px solid var(--color-error-alpha-20)"
+
+      disabled:
+        opacity: 0.5
+        background: "var(--color-neutral-100)"
+        cursor: "not-allowed"
+
+    validation:
+      timing: "on-blur"  # Don't annoy during typing
+      show_error: "after first blur or submit attempt"
+      clear_error: "on-input (when user fixes)"
+
+  autocomplete:
+    debounce: 300
+    min_chars: 2
+    max_results: 8
+
+    dropdown:
+      animation: "fade-slide-down"
+      duration: 200
+      easing: "ease-out"
+      max_height: 300
+      scroll: "virtualized if > 100 items"
+
+    keyboard_navigation:
+      - "Arrow Up/Down: Navigate options"
+      - "Enter: Select option"
+      - "Escape: Close dropdown"
+      - "Tab: Close and move to next field"
+
+  combobox:
+    pattern: "WAI-ARIA APG Combobox"
+    implementation:
+      - "role=\"combobox\""
+      - "aria-expanded=\"true|false\""
+      - "aria-controls=\"listbox-id\""
+      - "aria-activedescendant=\"option-id\""
+
+# =============================================================================
+# CONTENT PATTERNS
+# =============================================================================
+
+content:
+  progressive_disclosure:
+    principle: "Gradual revelation of complexity (Benji.org Simplicity pillar)"
+
+    accordion:
+      animation:
+        duration: 300
+        easing: "ease-in-out"
+        property: "transform: scaleY()"  # Not height
+
+      implementation: |
+        .accordion-content {
+          transform-origin: top;
+          transition: transform 300ms ease-in-out, opacity 300ms ease-out;
+        }
+
+        .accordion[data-collapsed] .accordion-content {
+          transform: scaleY(0);
+          opacity: 0;
+        }
+
+    show_more:
+      initial_lines: 3
+      animation: "fade-expand"
+      duration: 300
+
+  infinite_scroll:
+    threshold: 200  # px from bottom
+    loading_indicator: "spinner at bottom"
+    performance:
+      - "Virtualize list (react-window, react-virtualized)"
+      - "Debounce scroll handler"
+      - "Use IntersectionObserver, not scroll events"
+
+  empty_states:
+    philosophy: "Clear, actionable, not sad"
+
+    structure:
+      - "Icon (large, 48-64px)"
+      - "Headline (brief, specific)"
+      - "Description (what to do next)"
+      - "Primary action (CTA)"
+
+    example:
+      headline: "No projects yet"
+      description: "Create your first project to get started"
+      cta: "Create Project"
+
+# =============================================================================
+# INTERACTION PATTERNS
+# =============================================================================
+
+interaction:
+  drag_and_drop:
+    states:
+      dragging:
+        opacity: 0.5
+        cursor: "grabbing"
+        transform: "scale(1.05)"
+
+      drag_over:
+        border: "2px dashed var(--color-primary)"
+        background: "var(--color-primary-alpha-10)"
+
+    animation:
+      duration: 200
+      easing: "ease-out"
+
+    accessibility:
+      - "Keyboard alternative (arrow keys + space)"
+      - "Screen reader announcements"
+      - "Clear drop zones"
+
+  hover_cards:
+    delay: 200  # Don't show immediately
+    animation:
+      enter:
+        duration: 200
+        easing: "ease-out"
+        from: "opacity(0) translateY(-4px)"
+        to: "opacity(1) translateY(0)"
+
+      exit:
+        duration: 150
+        easing: "ease-in"
+
+    positioning: "Popper.js or Floating UI"
+    arrow: true
+    max_width: 300
+
+  context_menu:
+    trigger: "right-click or long-press"
+    animation:
+      enter:
+        duration: 150
+        easing: "ease-out"
+        from: "opacity(0) scale(0.95)"
+        to: "opacity(1) scale(1)"
+
+    keyboard:
+      - "Arrow keys: Navigate"
+      - "Enter: Select"
+      - "Escape: Close"
+
+# =============================================================================
+# LAYOUT PATTERNS
+# =============================================================================
+
+layout:
+  responsive_sidebar:
+    breakpoint: 768
+
+    desktop:
+      width: 280
+      position: "fixed"
+      transition: "none"
+
+    mobile:
+      width: "100%"
+      position: "fixed"
+      z_index: 1000
+      overlay: true
+      animation:
+        enter: "slide-right 300ms ease-out"
+        exit: "slide-left 200ms ease-in"
+
+  sticky_header:
+    height: 64
+    background: "var(--color-surface)"
+    border_bottom: "1px solid var(--color-border)"
+    backdrop_filter: "blur(8px)"  # Subtle translucency
+    z_index: 100
+
+    scroll_behavior:
+      hide_on_scroll_down: false  # Keep visible for accessibility
+      shadow_on_scroll: true
+
+      implementation: |
+        const [hasScrolled, setHasScrolled] = useState(false)
+
+        useEffect(() => {
+          const handleScroll = () => {
+            setHasScrolled(window.scrollY > 10)
+          }
+          window.addEventListener('scroll', handleScroll)
+          return () => window.removeEventListener('scroll', handleScroll)
+        }, [])
+
+  grid_layouts:
+    principles:
+      - "Optical alignment over mathematical precision"
+      - "Consistent gaps (use spacing scale)"
+      - "Responsive grid columns (not breakpoint soup)"
+
+    implementation: |
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-6);
+      }
+
+# =============================================================================
+# BENJI.ORG SPECIFIC PATTERNS
+# =============================================================================
+
+benji_patterns:
+  text_morphing:
+    description: "Smooth label transitions with text morphing"
+    use_case: "Button text changes, status updates"
+
+    implementation: |
+      // Use CSS transitions with character spacing
+      .text-morph {
+        transition: letter-spacing 200ms ease-out, opacity 200ms ease-out;
+      }
+
+      // Or use libraries like react-text-morph
+
+  delight_impact_curve:
+    principle: "Inversely scale delight with feature frequency"
+
+    high_frequency:
+      examples: ["Clicking buttons", "Typing", "Scrolling"]
+      animation: "Minimal or none (0-100ms)"
+      rationale: "Don't annoy users with repeated interactions"
+
+    medium_frequency:
+      examples: ["Opening modals", "Submitting forms", "Navigation"]
+      animation: "Moderate (200-300ms)"
+      rationale: "Provide feedback without delay"
+
+    low_frequency:
+      examples: ["First time onboarding", "Achievement unlocks", "Special actions"]
+      animation: "Delightful (500ms+, spring physics)"
+      rationale: "Create memorable moments"
+
+  equal_polish:
+    principle: "Neglecting any feature undermines overall quality"
+    rule: "Every interaction receives same attention to motion, spacing, typography"
+
+    checklist:
+      - "Loading states designed, not default spinners"
+      - "Empty states thoughtful, not 'No items'"
+      - "Error states helpful, not technical"
+      - "Success states celebrated, not just toasts"
+
+# =============================================================================
+# VERCEL GUIDELINES PATTERNS
+# =============================================================================
+
+vercel_patterns:
+  must_requirements:
+    keyboard_support:
+      - "Full navigation (Tab, Enter, Escape, Arrows)"
+      - "Visible focus indicators (:focus-visible)"
+      - "No keyboard traps"
+
+    animation:
+      - "Honor prefers-reduced-motion"
+      - "Compositor-friendly properties only (transform, opacity)"
+      - "< 500ms for mutations"
+
+    visual_hierarchy:
+      - "Optical alignment beats geometry"
+      - "Consistent spacing rhythm"
+      - "Clear visual weight differences"
+
+  should_requirements:
+    performance:
+      - "Virtualize lists > 100 items"
+      - "Debounce expensive operations"
+      - "Use loading skeletons, not spinners"
+
+    interaction:
+      - "Immediate feedback (optimistic UI)"
+      - "Undo for destructive actions"
+      - "Confirmation for irreversible actions"
+
+  never_requirements:
+    - "Never animate width/height/top/left"
+    - "Never block main thread > 50ms"
+    - "Never ignore prefers-reduced-motion"
+    - "Never trap keyboard focus"
+    - "Never sacrifice accessibility for aesthetics"
+
+# =============================================================================
+# ROUGH NOTATION PATTERNS
+# =============================================================================
+
+rough_notation:
+  philosophy: "Constraint-driven design - do one thing exceptionally well"
+
+  minimalism:
+    size: "3.83kb"
+    principle: "Small, focused, excellent execution"
+
+  annotation_styles:
+    - "underline"
+    - "box"
+    - "circle"
+    - "highlight"
+    - "strike-through"
+    - "crossed-off"
+    - "bracket"
+
+  timing:
+    default_duration: 800
+    configurable: true
+    bidirectional: "Draw and undraw patterns"
+
+  use_cases:
+    - "Highlighting key information"
+    - "Call-to-action emphasis"
+    - "Progressive disclosure cues"
+    - "Interactive storytelling"
+
+  implementation_note: "Study rough-notation for inspiration on focused, minimal interactions"
+
+# =============================================================================
+# COMPLETE PATTERN EXAMPLES
+# =============================================================================
+
+examples:
+  command_palette:
+    description: "Fuzzy search command palette (⌘K pattern)"
+
+    trigger: "Cmd/Ctrl + K"
+    animation:
+      overlay: "fade 150ms ease-out"
+      content: "scale + fade 200ms ease-out"
+
+    features:
+      - "Fuzzy search"
+      - "Keyboard navigation"
+      - "Recent searches"
+      - "Grouped results"
+
+    implementation: |
+      // React with cmdk library
+      import { Command } from 'cmdk'
+
+      <Command.Dialog open={open} onOpenChange={setOpen}>
+        <Command.Input placeholder="Search..." />
+        <Command.List>
+          <Command.Group heading="Suggestions">
+            <Command.Item>Calendar</Command.Item>
+          </Command.Group>
+        </Command.List>
+      </Command.Dialog>
+
+  pagination:
+    variants:
+      numbered:
+        show: "Current ± 2 pages, first, last"
+        mobile: "Current, next, prev only"
+
+      infinite:
+        threshold: 200
+        use: "IntersectionObserver"
+
+      load_more:
+        position: "centered button at end"
+        animation: "fade-in 200ms"
+
+  search:
+    debounce: 300
+    min_chars: 2
+
+    states:
+      idle: "Show placeholder"
+      typing: "Show loading indicator after 300ms"
+      results: "Show results with count"
+      no_results: "Show helpful empty state"
+      error: "Show retry option"
+
+    keyboard:
+      - "/ to focus search"
+      - "Escape to clear"
+      - "Arrow keys to navigate results"
+
+# =============================================================================
+# USAGE GUIDELINES
+# =============================================================================
+
+guidelines:
+  choosing_patterns:
+    questions:
+      - "Does this match user mental model?"
+      - "Is this the simplest solution?"
+      - "Have we maintained consistency with similar patterns?"
+      - "Does this work on all devices/screen sizes?"
+      - "Is this accessible to keyboard and screen reader users?"
+
+  adapting_patterns:
+    - "Start with established pattern"
+    - "Adapt to your specific context"
+    - "Maintain core accessibility features"
+    - "Test with actual users"
+    - "Document your adaptations"
+
+  performance_checklist:
+    - "Animations use transform/opacity only"
+    - "Long lists are virtualized"
+    - "Images are lazy loaded"
+    - "Debounce expensive operations"
+    - "Test on low-end devices"

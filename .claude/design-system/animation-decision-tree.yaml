@@ -1,0 +1,503 @@
+# Animation Decision Tree
+# A systematic approach to choosing the right animation curve and properties
+# Based on user-provided flowchart + motion.dev performance tier list
+
+version: "1.0"
+meta:
+  purpose: "Guide animation decisions for Apple-quality motion design"
+  source: "User flowchart + motion.dev/blog/web-animation-performance-tier-list"
+
+# =============================================================================
+# DECISION TREE
+# =============================================================================
+
+decision_tree:
+  root:
+    question: "Does the element change state or position?"
+    yes: "animation_needed"
+    no: "no_animation"
+
+  animation_needed:
+    question: "Has clear start and finish states?"
+    yes: "clear_states"
+    no: "use_spring"
+
+  clear_states:
+    question: "Does it represent time or progress?"
+    yes: "use_linear"
+    no: "check_transition"
+
+  check_transition:
+    question: "Is element transitioning between two states?"
+    yes: "use_ease_in_out"
+    no: "check_direction"
+
+  check_direction:
+    question: "Is element entering the view?"
+    yes: "use_ease_out"
+    no: "use_ease_in"
+
+  # Terminal nodes
+  no_animation:
+    curve: "none"
+    duration: 0
+    rationale: "Element doesn't change - no animation needed"
+
+  use_linear:
+    curve: "linear"
+    duration: "variable (based on duration)"
+    rationale: "Time-based animations should move at constant speed"
+    examples:
+      - "Progress bars"
+      - "Loading indicators"
+      - "Countdown timers"
+      - "Video playback scrubbing"
+
+  use_spring:
+    curve: "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
+    duration: 500
+    rationale: "No clear end state - spring physics feels natural and playful"
+    examples:
+      - "Draggable elements settling"
+      - "Elastic interactions"
+      - "Playful micro-interactions"
+      - "Physics-based animations"
+
+  use_ease_in_out:
+    curve: "cubic-bezier(0.4, 0, 0.2, 1)"
+    duration: 300
+    rationale: "Smooth transition between two equal states"
+    examples:
+      - "Tabs switching"
+      - "Accordion expand/collapse"
+      - "Modal state changes"
+      - "Component state transitions"
+
+  use_ease_out:
+    curve: "cubic-bezier(0, 0, 0.2, 1)"
+    duration: 200
+    rationale: "Element entering - fast start, smooth deceleration"
+    examples:
+      - "Dropdown menus appearing"
+      - "Tooltips showing"
+      - "Cards entering view"
+      - "Page elements loading in"
+
+  use_ease_in:
+    curve: "cubic-bezier(0.4, 0, 1, 1)"
+    duration: 200
+    rationale: "Element exiting - slow start, fast finish"
+    examples:
+      - "Dropdowns hiding"
+      - "Modals closing"
+      - "Elements leaving view"
+      - "Dismissing notifications"
+
+# =============================================================================
+# PERFORMANCE CONSIDERATIONS
+# =============================================================================
+
+performance_tiers:
+  description: "Property performance ranked by impact (motion.dev)"
+
+  top_tier:
+    properties: ["transform", "opacity"]
+    performance: "Compositor-only (hardware accelerated)"
+    fps: "60fps guaranteed"
+    priority: "ALWAYS USE THESE"
+    note: "Runs on GPU - no main thread blocking"
+
+    examples:
+      - "transform: translateY(-2px)"
+      - "transform: scale(1.05)"
+      - "transform: rotate(45deg)"
+      - "opacity: 0 → 1"
+
+  improving_tier:
+    properties: ["filter", "background-color", "clip-path"]
+    performance: "Improving but not guaranteed 60fps"
+    fps: "30-60fps depending on device"
+    priority: "Use sparingly, test on target devices"
+    note: "May cause paint operations"
+
+    examples:
+      - "filter: blur(4px)"
+      - "background-color: #000 → #fff"
+      - "clip-path: circle(50%)"
+
+  avoid_tier:
+    properties: ["width", "height", "top", "left", "margin", "padding"]
+    performance: "Triggers layout recalculation (reflow)"
+    fps: "< 30fps, janky experience"
+    priority: "NEVER ANIMATE unless absolutely necessary"
+    note: "Forces entire layout recalculation"
+
+    alternatives:
+      - "Instead of width/height → Use transform: scale()"
+      - "Instead of top/left → Use transform: translate()"
+      - "Instead of margin → Use transform or padding visual tricks"
+
+# =============================================================================
+# CONTEXTUAL GUIDANCE
+# =============================================================================
+
+context_based_recommendations:
+  micro_interactions:
+    description: "Small, frequent user interactions (hover, focus, active)"
+    recommended_curve: "ease-out"
+    recommended_duration: 200
+    recommended_properties: ["transform", "opacity"]
+
+    examples:
+      button_hover:
+        transform: "translateY(-1px)"
+        box_shadow: "0 4px 12px rgba(0,0,0,0.08)"
+        duration: 200
+        easing: "ease-out"
+
+      button_active:
+        transform: "scale(0.98)"
+        duration: 100
+        easing: "ease-out"
+
+      link_hover:
+        opacity: 0.8
+        duration: 150
+        easing: "ease-out"
+
+  page_transitions:
+    description: "Navigation between pages or major view changes"
+    recommended_curve: "ease-in-out"
+    recommended_duration: 300
+    recommended_properties: ["transform", "opacity"]
+
+    examples:
+      slide_transition:
+        enter:
+          transform: "translateX(100%)"
+          opacity: 0
+          duration: 300
+          easing: "ease-out"
+
+        exit:
+          transform: "translateX(-100%)"
+          opacity: 0
+          duration: 300
+          easing: "ease-in"
+
+      fade_transition:
+        enter:
+          opacity: 0
+          duration: 200
+          easing: "ease-out"
+
+        exit:
+          opacity: 0
+          duration: 200
+          easing: "ease-in"
+
+  orchestrated_sequences:
+    description: "Multiple elements animating in sequence"
+    recommended_curve: "ease-out"
+    recommended_duration: 500
+    stagger: 50
+
+    pattern: |
+      @keyframes stagger-fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .item:nth-child(1) { animation-delay: 0ms; }
+      .item:nth-child(2) { animation-delay: 50ms; }
+      .item:nth-child(3) { animation-delay: 100ms; }
+
+  loading_states:
+    description: "Progress indicators and loading animations"
+    recommended_curve: "linear"
+    recommended_duration: "variable"
+    recommended_properties: ["transform"]
+
+    examples:
+      spinner:
+        animation: "rotate 1s linear infinite"
+        transform: "rotate(360deg)"
+
+      progress_bar:
+        animation: "linear"
+        property: "transform: scaleX()"
+        note: "Use transform: scaleX() instead of width"
+
+      skeleton:
+        animation: "shimmer 1500ms linear infinite"
+        property: "background-position"
+
+# =============================================================================
+# SPECIAL TECHNIQUES
+# =============================================================================
+
+special_techniques:
+  motion_blur:
+    description: "Add subtle 1px blur during rapid motion for smoothness"
+    when_to_use: "Fast movements (< 200ms) or large distances"
+
+    implementation: |
+      @keyframes slide-with-blur {
+        0% {
+          transform: translateY(20px);
+          filter: blur(0);
+        }
+        50% {
+          filter: blur(1px);
+        }
+        100% {
+          transform: translateY(0);
+          filter: blur(0);
+        }
+      }
+
+  anticipation:
+    description: "Small movement in opposite direction before main animation"
+    when_to_use: "Playful, low-frequency interactions"
+
+    implementation: |
+      @keyframes anticipate-bounce {
+        0% {
+          transform: translateY(0);
+        }
+        20% {
+          transform: translateY(-2px);  /* Anticipation */
+        }
+        100% {
+          transform: translateY(10px);  /* Main movement */
+        }
+      }
+
+  overshoot:
+    description: "Animation goes slightly beyond target before settling"
+    when_to_use: "Spring-like, energetic interactions"
+
+    implementation: |
+      @keyframes overshoot {
+        0% {
+          transform: scale(0);
+        }
+        70% {
+          transform: scale(1.1);  /* Overshoot */
+        }
+        100% {
+          transform: scale(1);    /* Settle */
+        }
+      }
+
+# =============================================================================
+# ACCESSIBILITY
+# =============================================================================
+
+accessibility:
+  prefers_reduced_motion:
+    description: "Respect user preference for reduced motion"
+    implementation: |
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+    alternative_approach:
+      - "Disable decorative animations entirely"
+      - "Keep essential state transitions (instant duration)"
+      - "Maintain functionality without animation"
+
+# =============================================================================
+# DECISION MATRIX
+# =============================================================================
+
+decision_matrix:
+  description: "Quick reference for choosing animation properties"
+
+  by_use_case:
+    hover_state:
+      curve: "ease-out"
+      duration: 200
+      properties: ["transform", "opacity", "box-shadow"]
+
+    active_state:
+      curve: "ease-out"
+      duration: 100
+      properties: ["transform"]
+
+    entering_view:
+      curve: "ease-out"
+      duration: 300
+      properties: ["transform", "opacity"]
+
+    leaving_view:
+      curve: "ease-in"
+      duration: 200
+      properties: ["transform", "opacity"]
+
+    state_transition:
+      curve: "ease-in-out"
+      duration: 300
+      properties: ["transform", "opacity"]
+
+    progress_indicator:
+      curve: "linear"
+      duration: "variable"
+      properties: ["transform"]
+
+    playful_interaction:
+      curve: "spring (cubic-bezier(0.68, -0.55, 0.265, 1.55))"
+      duration: 500
+      properties: ["transform"]
+
+  by_element_type:
+    button:
+      hover: { curve: "ease-out", duration: 200 }
+      active: { curve: "ease-out", duration: 100 }
+
+    card:
+      hover: { curve: "ease-out", duration: 200 }
+      enter: { curve: "ease-out", duration: 300 }
+
+    modal:
+      enter: { curve: "ease-out", duration: 300 }
+      exit: { curve: "ease-in", duration: 200 }
+
+    dropdown:
+      enter: { curve: "ease-out", duration: 200 }
+      exit: { curve: "ease-in", duration: 150 }
+
+    toast:
+      enter: { curve: "ease-out", duration: 300 }
+      exit: { curve: "ease-in", duration: 200 }
+
+# =============================================================================
+# COMPLETE EXAMPLES
+# =============================================================================
+
+examples:
+  button_interaction:
+    description: "Complete button with hover, active, and focus states"
+
+    css: |
+      .button {
+        transition: all 200ms ease-out;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .button:active {
+        transform: scale(0.98);
+        transition-duration: 100ms;
+      }
+
+      .button:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+  card_entrance:
+    description: "Card fading up into view with stagger"
+
+    css: |
+      @keyframes card-enter {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+          filter: blur(0);
+        }
+        50% {
+          filter: blur(1px);  /* Motion blur at midpoint */
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0);
+        }
+      }
+
+      .card {
+        animation: card-enter 300ms ease-out both;
+      }
+
+      .card:nth-child(1) { animation-delay: 0ms; }
+      .card:nth-child(2) { animation-delay: 50ms; }
+      .card:nth-child(3) { animation-delay: 100ms; }
+
+  modal_interaction:
+    description: "Modal with overlay fade and content scale"
+
+    css: |
+      /* Overlay */
+      @keyframes overlay-enter {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .modal-overlay {
+        animation: overlay-enter 200ms ease-out both;
+      }
+
+      /* Content */
+      @keyframes modal-enter {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .modal-content {
+        animation: modal-enter 300ms ease-out 50ms both;
+      }
+
+# =============================================================================
+# USAGE GUIDELINES
+# =============================================================================
+
+usage_guidelines:
+  when_to_animate:
+    do:
+      - "State changes (hover, focus, active)"
+      - "Content entering/leaving view"
+      - "Feedback for user actions"
+      - "Directional navigation"
+      - "Progress indication"
+
+    dont:
+      - "Purely decorative motion"
+      - "High-frequency events (scroll, mousemove)"
+      - "When it slows down perceived performance"
+      - "If it violates prefers-reduced-motion"
+
+  testing:
+    - "Test on low-end devices (iPhone SE, Android mid-range)"
+    - "Throttle CPU 4x in Chrome DevTools"
+    - "Verify 60fps in Performance panel"
+    - "Test with prefers-reduced-motion enabled"
+    - "Check on different screen sizes"
+
+  debugging:
+    - "Use Chrome DevTools Performance panel"
+    - "Look for long tasks (> 50ms)"
+    - "Check for layout thrashing"
+    - "Verify compositor-only animations (green bars)"
+    - "Profile on actual devices, not desktop"

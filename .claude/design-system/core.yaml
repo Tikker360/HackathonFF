@@ -1,0 +1,656 @@
+# Technical Design System - Core Specifications
+# For code implementation: React, Swift, TypeScript
+# Target: Apple-level UI/UX quality with web performance constraints
+
+version: "1.0"
+meta:
+  philosophy: "Performance-first, human-centered, delightfully minimal"
+  target: "Apple-level polish with web performance constraints"
+  inspired_by:
+    - "benji.org/family-values - Simplicity, Fluidity, Delight"
+    - "motion.dev performance tier list"
+    - "Vercel Agent Guidelines"
+    - "Claude Frontend Aesthetics Cookbook"
+
+# =============================================================================
+# FOUNDATIONS
+# =============================================================================
+
+foundations:
+  spacing:
+    base: 4
+    scale: [0, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256]
+    rules:
+      - "Use consistent spacing rhythm throughout"
+      - "Optical adjustments: ±1px when perception beats geometry"
+      - "Mobile touch targets: minimum 44px"
+      - "Desktop click targets: minimum 24px"
+
+  typography:
+    families:
+      display:
+        - "SF Pro Display"
+        - "Playfair Display"
+        - "system-ui"
+      body:
+        - "SF Pro Text"
+        - "Inter"
+        - "-apple-system"
+        - "BlinkMacSystemFont"
+        - "system-ui"
+      mono:
+        - "SF Mono"
+        - "JetBrains Mono"
+        - "Consolas"
+        - "monospace"
+
+    sizes:
+      scale: [12, 14, 16, 20, 24, 32, 48, 64, 96, 128]
+      rules:
+        - "3x+ jumps for visual hierarchy (not gradual steps)"
+        - "Weight contrasts: 100 vs 900 for drama"
+        - "Mobile inputs ≥16px to prevent browser zoom"
+        - "Body text: 16px minimum for readability"
+        - "Headings: Use extreme scale jumps (16 → 48 → 128)"
+
+    weights:
+      thin: 100
+      light: 300
+      regular: 400
+      medium: 500
+      semibold: 600
+      bold: 700
+      black: 900
+
+    line_heights:
+      tight: 1.2
+      normal: 1.5
+      relaxed: 1.75
+      loose: 2
+
+  colors:
+    approach: "Dominant colors with sharp accents (not timid palettes)"
+
+    semantic:
+      primary:
+        value: "#007AFF"
+        usage: "Primary actions, links, focus states"
+        dark: "#0A84FF"
+
+      success:
+        value: "#34C759"
+        dark: "#30D158"
+
+      warning:
+        value: "#FF9500"
+        dark: "#FF9F0A"
+
+      error:
+        value: "#FF3B30"
+        dark: "#FF453A"
+
+      neutral:
+        50: "#F9FAFB"
+        100: "#F3F4F6"
+        200: "#E5E7EB"
+        300: "#D1D5DB"
+        400: "#9CA3AF"
+        500: "#6B7280"
+        600: "#4B5563"
+        700: "#374151"
+        800: "#1F2937"
+        900: "#111827"
+
+    rules:
+      - "60-30-10 rule: 60% dominant, 30% secondary, 10% accent"
+      - "Support both light and dark modes via CSS color-scheme"
+      - "Use light-dark() CSS function for dynamic theming"
+      - "Avoid timid colors - commit to bold choices"
+
+    css_pattern: |
+      html { color-scheme: light dark; }
+      [data-theme=light] { color-scheme: light; }
+      [data-theme=dark] { color-scheme: dark; }
+      .element { color: light-dark(#FF3B30, #FF453A); }
+
+  shadows:
+    approach: "Layered shadows: ambient + direct for depth"
+
+    levels:
+      xs: "0 1px 2px rgba(0, 0, 0, 0.05)"
+      sm: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+      md: "0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05)"
+      lg: "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)"
+      xl: "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"
+
+    rules:
+      - "Combine ambient (larger, softer) + direct (smaller, sharper)"
+      - "Use sparingly - shadows indicate hierarchy"
+      - "Adjust opacity in dark mode (reduce intensity)"
+
+  borders:
+    radius:
+      none: 0
+      sm: 4
+      md: 8
+      lg: 12
+      xl: 16
+      full: 9999
+
+    width:
+      thin: 1
+      medium: 2
+      thick: 4
+
+    rules:
+      - "Consistent radius throughout related components"
+      - "Full radius for circular elements (avatars, badges)"
+      - "Optical alignment beats mathematical precision"
+
+# =============================================================================
+# MOTION & ANIMATION
+# =============================================================================
+
+motion:
+  philosophy:
+    - "Performance-first: Only animate transform and opacity"
+    - "Purposeful, not decorative: Every animation has intent"
+    - "Directional: We fly instead of teleport (Benji.org)"
+    - "Interruptible: User input always takes precedence"
+    - "Honor prefers-reduced-motion: Accessibility is non-negotiable"
+
+  principles:
+    simplicity:
+      - "Gradual revelation of complexity"
+      - "One orchestrated page load over scattered micro-interactions"
+
+    fluidity:
+      - "Seamless transitions preserve context"
+      - "Directional motion indicates spatial relationships"
+      - "Spring physics for natural feel"
+
+    delight:
+      - "Inversely scale with feature frequency"
+      - "High-frequency actions: subtle or no animation"
+      - "Low-frequency actions: delightful moments"
+      - "Equal polish everywhere - no neglected features"
+
+  performance:
+    top_tier:
+      properties: ["transform", "opacity"]
+      note: "Hardware-accelerated, compositor-only (60fps guaranteed)"
+      priority: "ALWAYS USE THESE"
+
+    improving:
+      properties: ["filter", "background-color", "clip-path"]
+      note: "Improving but not guaranteed 60fps on all devices"
+      priority: "Use sparingly, test on target devices"
+
+    avoid:
+      properties: ["width", "height", "top", "left", "margin", "padding"]
+      note: "Trigger layout recalculation (poor performance)"
+      priority: "NEVER animate unless absolutely necessary"
+
+  timings:
+    instant: 0
+    fast: 150
+    quick: 200
+    normal: 300
+    moderate: 400
+    slow: 500
+    deliberate: 800
+
+    rules:
+      - "200ms default for micro-interactions (hover, focus)"
+      - "300ms for transitions between states"
+      - "500ms+ for page transitions and orchestrated sequences"
+      - "Keep under 800ms to avoid perceived lag"
+
+  easings:
+    default: "cubic-bezier(0.4, 0, 0.2, 1)"  # ease-out
+    ease_in: "cubic-bezier(0.4, 0, 1, 1)"
+    ease_out: "cubic-bezier(0, 0, 0.2, 1)"
+    ease_in_out: "cubic-bezier(0.4, 0, 0.2, 1)"
+    spring: "cubic-bezier(0.68, -0.55, 0.265, 1.55)"  # bouncy
+    smooth: "cubic-bezier(0.45, 0, 0.55, 1)"
+
+    usage:
+      - "ease-out: default for most interactions (snappy response)"
+      - "ease-in: elements exiting the screen"
+      - "ease-in-out: transitions between states"
+      - "spring: playful interactions, low-frequency actions"
+      - "linear: time-based animations only"
+
+  patterns:
+    micro_interaction:
+      description: "Small, frequent user interactions"
+
+      hover:
+        transform: "translateY(-2px)"
+        box_shadow: "0 4px 12px rgba(0,0,0,0.08)"
+        duration: 200
+        easing: "ease-out"
+        note: "Slight offset with 1px blur for smoothness"
+
+      active:
+        transform: "scale(0.98)"
+        duration: 100
+        easing: "ease-out"
+
+      focus:
+        outline: "2px solid var(--color-primary)"
+        outline_offset: 2
+        duration: 150
+        note: "Use :focus-visible to avoid mouse click outlines"
+
+    page_enter:
+      description: "Orchestrated entrance animation"
+      duration: 500
+      stagger: 50
+      sequence:
+        - element: "header"
+          animation: "fade-in"
+          delay: 0
+
+        - element: "content"
+          animation: "slide-up"
+          delay: 50
+          stagger: true
+
+        - element: "interactive"
+          animation: "activate"
+          delay: 200
+
+      note: "Stagger child elements for progressive reveal"
+
+    state_transition:
+      description: "Transitioning between component states"
+      duration: 300
+      easing: "ease-in-out"
+
+      example: |
+        /* Smooth height transition with transform */
+        .element {
+          transition: transform 300ms ease-in-out;
+        }
+        .element[data-expanded] {
+          transform: scaleY(1.5);
+        }
+
+    blur_motion:
+      description: "1px blur during rapid motion for smoothness"
+      implementation: |
+        @keyframes slide-with-blur {
+          0% {
+            transform: translateY(20px);
+            filter: blur(0);
+          }
+          50% {
+            filter: blur(1px);
+          }
+          100% {
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+
+  accessibility:
+    prefers_reduced_motion: |
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+# =============================================================================
+# COMPONENTS
+# =============================================================================
+
+components:
+  button:
+    philosophy: "Clear, confident, accessible"
+
+    sizes:
+      small:
+        height: 32
+        padding: "0 12px"
+        font_size: 14
+        font_weight: 500
+
+      medium:
+        height: 40
+        padding: "0 16px"
+        font_size: 16
+        font_weight: 500
+
+      large:
+        height: 48
+        padding: "0 24px"
+        font_size: 18
+        font_weight: 600
+
+    variants:
+      primary:
+        background: "var(--color-primary)"
+        color: "white"
+        border: "none"
+
+      secondary:
+        background: "transparent"
+        color: "var(--color-primary)"
+        border: "1px solid var(--color-primary)"
+
+      ghost:
+        background: "transparent"
+        color: "var(--color-neutral-700)"
+        border: "none"
+
+    states:
+      default:
+        background: "var(--color-primary)"
+        color: "white"
+        border_radius: 8
+        cursor: "pointer"
+
+      hover:
+        transform: "translateY(-1px)"
+        box_shadow: "0 4px 12px rgba(0, 122, 255, 0.15)"
+        transition: "all 200ms ease-out"
+
+      active:
+        transform: "scale(0.98)"
+        transition: "transform 100ms ease-out"
+
+      focus:
+        outline: "2px solid var(--color-primary)"
+        outline_offset: 2
+
+      disabled:
+        opacity: 0.5
+        cursor: "not-allowed"
+        pointer_events: "none"
+
+    accessibility:
+      - "Minimum 44px touch target on mobile"
+      - "Minimum 24px click target on desktop"
+      - "Visible focus ring with :focus-visible"
+      - "Disabled state prevents interaction"
+      - "ARIA labels for icon-only buttons"
+
+  card:
+    philosophy: "Contain related content with clear hierarchy"
+
+    structure:
+      padding: 24
+      border_radius: 12
+      background: "var(--color-surface)"
+      border: "1px solid var(--color-border)"
+      box_shadow: "var(--shadow-sm)"
+
+    states:
+      hover:
+        transform: "translateY(-2px)"
+        box_shadow: "var(--shadow-md)"
+        transition: "all 200ms ease-out"
+
+      active:
+        transform: "scale(0.99)"
+
+    enter_animation:
+      duration: 500
+      stagger: 50
+      animation: |
+        @keyframes card-enter {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+  input:
+    philosophy: "Clear, accessible, forgiving"
+
+    sizes:
+      small:
+        height: 32
+        padding: "0 12px"
+        font_size: 14
+
+      medium:
+        height: 40
+        padding: "0 16px"
+        font_size: 16
+
+      large:
+        height: 48
+        padding: "0 20px"
+        font_size: 18
+
+    states:
+      default:
+        border: "1px solid var(--color-border)"
+        border_radius: 8
+        background: "var(--color-surface)"
+
+      focus:
+        border_color: "var(--color-primary)"
+        outline: "2px solid var(--color-primary-alpha-20)"
+        outline_offset: 0
+        transition: "all 150ms ease-out"
+
+      error:
+        border_color: "var(--color-error)"
+        outline: "2px solid var(--color-error-alpha-20)"
+
+      disabled:
+        opacity: 0.5
+        cursor: "not-allowed"
+        background: "var(--color-neutral-100)"
+
+    accessibility:
+      - "Minimum 16px font size on mobile (prevents zoom)"
+      - "Clear focus indicators"
+      - "Associated labels with for/id"
+      - "Error messages announced by screen readers"
+      - "Placeholder text never replaces labels"
+
+# =============================================================================
+# PATTERNS
+# =============================================================================
+
+patterns:
+  navigation:
+    transitions:
+      type: "slide"
+      direction: "contextual"  # Based on position in nav hierarchy
+      duration: 300
+      easing: "ease-in-out"
+      principle: "We fly instead of teleport (directional motion)"
+
+    example: |
+      /* Forward navigation: slide left */
+      .nav-forward {
+        animation: slide-left 300ms ease-in-out;
+      }
+
+      /* Backward navigation: slide right */
+      .nav-backward {
+        animation: slide-right 300ms ease-in-out;
+      }
+
+  feedback:
+    toast:
+      position: "top-center"
+      animation: "slide-down + fade"
+      duration: 300
+      auto_dismiss: 4000
+      easing: "ease-out"
+
+      states:
+        enter: "translateY(-100%) opacity(0)"
+        visible: "translateY(0) opacity(1)"
+        exit: "translateY(-100%) opacity(0)"
+
+    modal:
+      overlay:
+        background: "rgba(0, 0, 0, 0.5)"
+        backdrop_filter: "blur(4px)"
+        animation: "fade 200ms ease-out"
+
+      content:
+        animation: "scale + fade 300ms ease-out"
+        transform_origin: "center"
+
+        states:
+          enter: "scale(0.95) opacity(0)"
+          visible: "scale(1) opacity(1)"
+          exit: "scale(0.95) opacity(0)"
+
+  loading:
+    skeleton:
+      animation: "shimmer"
+      duration: 1500
+      rule: "Must mirror final content layout exactly"
+
+      shimmer_animation: |
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+
+    spinner:
+      size: 24
+      stroke_width: 2
+      animation: "rotate 1s linear infinite"
+      color: "var(--color-primary)"
+
+# =============================================================================
+# ACCESSIBILITY
+# =============================================================================
+
+accessibility:
+  requirements:
+    keyboard:
+      - "Full keyboard navigation (Tab, Enter, Escape, Arrows)"
+      - "Visible focus rings with :focus-visible"
+      - "Skip to main content link"
+      - "Logical tab order (no tabindex hacks)"
+
+    screen_readers:
+      - "Semantic HTML before ARIA"
+      - "ARIA labels for icon buttons"
+      - "Live regions for dynamic content"
+      - "Hidden decorative elements (aria-hidden)"
+
+    visual:
+      - "APCA contrast over WCAG 2.0"
+      - "Minimum 24px hit targets (44px mobile)"
+      - "No information conveyed by color alone"
+      - "Focus indicators: 2px, high contrast"
+
+    motion:
+      - "Honor prefers-reduced-motion"
+      - "Disable animations if user prefers"
+      - "Maintain functionality without animation"
+
+  aria_patterns:
+    button: |
+      <button aria-label="Close dialog" aria-pressed="false">
+
+    dialog: |
+      <div role="dialog" aria-labelledby="title" aria-modal="true">
+
+    tabs: |
+      <div role="tablist">
+        <button role="tab" aria-selected="true" aria-controls="panel-1">
+
+# =============================================================================
+# PERFORMANCE
+# =============================================================================
+
+performance:
+  targets:
+    mutation: "< 500ms"
+    animation: "60fps (16.67ms per frame)"
+    cls: "< 0.1"
+    fid: "< 100ms"
+    lcp: "< 2.5s"
+
+  rules:
+    general:
+      - "Virtualize lists > 100 items"
+      - "Lazy load below-fold images"
+      - "Preload critical resources only"
+      - "Code split by route"
+      - "Compress images (WebP, AVIF)"
+
+    animation:
+      - "Use transform and opacity ONLY"
+      - "Avoid animating layout properties"
+      - "Use will-change sparingly (only during animation)"
+      - "Remove will-change after animation completes"
+      - "Test on low-end devices (not just MacBook Pro)"
+
+    rendering:
+      - "Avoid layout thrashing (batch DOM reads/writes)"
+      - "Use CSS containment for independent components"
+      - "Debounce scroll/resize handlers"
+      - "Use requestAnimationFrame for visual updates"
+
+  testing:
+    - "Test on iPhone SE (low-end mobile)"
+    - "Test on Android mid-range device"
+    - "Throttle CPU in Chrome DevTools (4x slowdown)"
+    - "Use Performance panel to identify bottlenecks"
+
+# =============================================================================
+# QUALITY CHECKLIST
+# =============================================================================
+
+quality_checklist:
+  visual:
+    - "Extreme typography contrasts (not gradual)"
+    - "Dominant colors with sharp accents"
+    - "Layered shadows (ambient + direct)"
+    - "Optical alignment when needed"
+    - "Consistent spacing rhythm"
+
+  motion:
+    - "Only transform and opacity animated"
+    - "200ms for micro-interactions"
+    - "Subtle 1px blur during rapid motion"
+    - "Spring physics for playful moments"
+    - "Honors prefers-reduced-motion"
+
+  accessibility:
+    - "Full keyboard navigation"
+    - "Visible focus indicators"
+    - "Semantic HTML structure"
+    - "APCA contrast compliance"
+    - "44px touch targets (mobile)"
+
+  performance:
+    - "60fps animations guaranteed"
+    - "< 500ms for state mutations"
+    - "Virtualized long lists"
+    - "Lazy loaded images"
+    - "Tested on low-end devices"
+
+  code_quality:
+    - "TypeScript strict mode"
+    - "Prop types validated"
+    - "Error boundaries implemented"
+    - "Loading states prevent CLS"
+    - "No console errors or warnings"

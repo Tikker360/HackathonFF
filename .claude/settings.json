@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:nextjs.org)",
+      "WebSearch",
+      "Read(//Users/cthor/**)",
+      "Read(//tmp/**)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(sl:*)",
+      "Bash(sl log:*)",
+      "Bash(sl book:*)",
+      "Bash(sl status:*)",
+      "Bash(sl bookmarks:*)",
+      "Bash(gh:*)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": false
+}

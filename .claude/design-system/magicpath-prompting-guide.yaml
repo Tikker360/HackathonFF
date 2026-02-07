@@ -1,0 +1,300 @@
+# MagicPath Conversational Prompting Guide
+# Optimized for canvas-based rapid prototyping with natural language
+
+version: "1.0"
+meta:
+  purpose: "Enable AI to generate MagicPath-optimized prompts for Apple-level UI prototypes"
+  style: "Conversational, narrative, interaction-focused"
+  platform: "https://www.magicpath.ai/"
+
+core_principles:
+  tone:
+    - "Be direct and conversational - use 'Let's create...' or 'Create a...'"
+    - "Think like describing to a colleague, not writing documentation"
+    - "Be succinct to reduce credit cost, vague to be exploratory"
+    - "Focus on user interactions and flows, not implementation details"
+
+  structure:
+    - "Start with the overall concept and purpose"
+    - "Describe user flow chronologically"
+    - "Include visual design references"
+    - "Specify technical integrations (APIs, libraries)"
+    - "End with sizing or layout considerations if relevant"
+
+  enhancement:
+    - "Always prefer uploading reference images or sketches"
+    - "Screenshots of interactions/sites/dashboards work extremely well"
+    - "Pen and paper sketches are the ultimate prototyping tool"
+    - "Mention existing components with @ symbol for composition"
+
+starter_patterns:
+  opening_phrases:
+    exploratory:
+      - "Let's create..."
+      - "Can you create..."
+      - "Let's make..."
+      - "Build a..."
+
+    specific:
+      - "Create a component..."
+      - "Create an element..."
+      - "Make a mobile..."
+      - "Build a modern..."
+
+  flow_description:
+    interaction_sequence:
+      - "When I [action], [result] should happen"
+      - "Tapping [element] will [outcome]"
+      - "When [condition], let's make it so that [behavior]"
+      - "As the user [action], it should [response]"
+
+    state_changes:
+      - "When closed, it appears as [state A]. When clicked, it opens up into [state B]"
+      - "At all other times, [default state]. When [trigger], [active state]"
+      - "The [element] should start [initial state], and [transition description]"
+
+    visual_transitions:
+      - "The animation should be smooth and a little bouncy"
+      - "Animate in from the bottom with a faded blur effect"
+      - "The transition from [state A] to [state B] should be smooth and [quality]"
+
+component_composition:
+  using_mentions:
+    syntax: "@Component Name"
+    examples:
+      - "Match our visual style using @Status Bar at the top"
+      - "When I press purchase, animate using @Enable Notification Card"
+      - "Include @Dial Pad Dark below with @Bottom navigation at the bottom"
+
+    important:
+      - "Use @ to reference components already on canvas"
+      - "This enables visual consistency and composition"
+      - "The model understands spatial relationships (top, below, at the bottom)"
+
+creating_vs_composing:
+  single_elements:
+    phrase_required: "Must use 'create a component' or 'create an element'"
+    examples:
+      - "Create a component that lists web components with visual previews"
+      - "Create an element for a signature button"
+    sizing:
+      - "It should be about 338px by 418px"
+      - "The main font size for this is 12px"
+
+  full_pages:
+    default: "Omit 'component' phrase for full page designs"
+    examples:
+      - "Create a freelance project quote creator mobile app"
+      - "Let's create a story creation app called Journey"
+
+visual_design_language:
+  minimalism:
+    - "Clean visual hierarchy with clear CTAs"
+    - "Avoid gradients" (unless specifically needed)
+    - "Single column layout for mobile"
+    - "Touch-friendly interface"
+
+  polish_indicators:
+    - "The first letter of the first paragraph a dropcap"
+    - "Make it look like a mobile-optimized book or E-reader"
+    - "Use the color palette I've attached in the images"
+    - "Match our visual style" (when @mentioning)
+
+  motion_quality:
+    - "The animation transition should be smooth and a little bouncy"
+    - "Slight offset, 200ms easing out, and a subtle 1px blur"
+    - "The numbers should animate in from the bottom with a faded blur effect"
+    - "A line will pass over all drawn lines and play the sound as it passes"
+
+technical_integrations:
+  common_libraries:
+    time:
+      phrase: "sync to the current time using moment.js"
+      use_case: "Countdowns, timezone visualizations, realtime updates"
+
+    audio:
+      phrase: "Use tone.js to produce the sounds"
+      use_case: "Music apps, notifications, interaction feedback"
+
+    maps:
+      phrase: "Add the map using mapbox.js, with a spot for me to input my API key"
+      use_case: "Location-based features"
+
+    webcam:
+      phrase: "Get the user's webcam feed using getMediaObject"
+      use_case: "Video calls, facedock, AR features"
+
+    api_integration:
+      phrase: "Submitting chat requests calls the chatGPT API"
+      api_key_pattern: "User must input their API key into a field accessible via [location]"
+      important: "NEVER write in API keys or tokens - always create slots for user input"
+
+interaction_patterns:
+  buttons_and_actions:
+    - "There should be [number] buttons at the bottom: [list with descriptions]"
+    - "When I tap [button], [outcome]"
+    - "When I press [action], we should [result]"
+    - "A [button] in the [location] should appear to [purpose]"
+
+  input_and_editing:
+    - "I should be able to [action] and see [result]"
+    - "The user can [primary action] with [method]"
+    - "Use a slider to [control] which should [effect]"
+    - "I can select each [item] and [action]"
+
+  layout_and_organization:
+    - "A toolbar on the left with [items]"
+    - "A sidebar on the left for [purpose], a center area for [purpose], and a right sidebar for [purpose]"
+    - "Show [content] in a vertically scrollable list"
+    - "Contain them within a single button group"
+
+  state_and_feedback:
+    - "When [trigger], things in the story should get [adjective]"
+    - "If I set quantity to 0, the items should be removed"
+    - "A loading state where the response is being generated"
+    - "They should get more wavy when [condition]"
+
+animation_vocabulary:
+  quality_descriptors:
+    - "smooth and a little bouncy"
+    - "faded blur effect"
+    - "subtle 1px blur"
+    - "dramatic gradient"
+    - "fills up from the direction they started in"
+    - "animates on a loop"
+
+  movement_patterns:
+    - "slides up with staggered delays"
+    - "fades in"
+    - "animate in from the bottom"
+    - "follows their cursor"
+    - "moves with the typewriter head"
+
+  transitions:
+    - "The transition should be [quality]"
+    - "Animate the card to show [next state]"
+    - "The feed should transition from circle to dock"
+
+complete_examples:
+  simple_component:
+    prompt: |
+      Create a signature button on a canvas. When closed, it appears as a pencil
+      icon in a round button. When clicked, it opens up into a small drawable area
+      with a note in the top left saying draw signature, and a hold to confirm
+      button in the bottom right.
+
+      The user can draw their signature with a mouse, and once they finish, the
+      signature animates on a loop filling up from the direction they started in,
+      similar to a stroke animation with SVG. The ghost of the signature appears,
+      with a darker stroke animating to fill it as if drawing on a loop.
+
+    result_url: "https://designs.magicpath.ai/v1/soft-space-4720"
+
+  complex_interaction:
+    prompt: |
+      Let's make a demo of something called a facedock. The concept is that you
+      can draw a frame inside of an infinite canvas app that acts as a "dock" for
+      a user's webcam feed. It's a resizable object that gets filled with the
+      user's webcam feed when they hover over it.
+
+      At all other times, their webcam feed is locked into a circle that follows
+      their cursor in the app to show other people their presence.
+
+      When the feed is inside of the dock object, the user can click to lock it
+      in place so that when their cursor leaves the dock it stays inside and no
+      longer follows. When they click on the locked dock again, the feed follows
+      the cursor again.
+
+      The user can draw multiple facedock objects using a tool in the toolbar at
+      the bottom. The toolbar also contains a way to turn off their webcam feed.
+      The animation transition should be smooth and a little bouncy.
+
+    result_url: "https://designs.magicpath.ai/v1/kindly-leaf-8116"
+
+  technical_app:
+    prompt: |
+      Create a minimal, modern, dark-mode clock countdown interface that counts
+      down to two days in the future. The clock should have large sans-serif type
+      that shows hours : minutes : seconds counting in realtime synced to the
+      current time using moment.js. The numbers should animate in from the bottom
+      of the previous numbers with a faded blur effect.
+
+    result_url: "https://designs.magicpath.ai/v1/cozy-village-3262"
+
+  with_composition:
+    prompt: |
+      Let's add controls to the right of each item to be able to drag and reorder
+      them, and change quantity with a plus and minus icon on either side of an
+      input showing a count. If I set quantity to 0 the items should be removed.
+      Match our visual style.
+
+      When I press purchase, we should animate the card to show a purchase
+      complete modal using @Enable Notification Card
+
+    note: "References existing component with @ for composition"
+
+best_practices:
+  do:
+    - "Break down interactions into chronological steps"
+    - "Use conversational, natural language"
+    - "Reference visual examples when possible"
+    - "Specify library integrations explicitly (moment.js, tone.js, etc.)"
+    - "Include sizing for components (338px by 418px, font 12px)"
+    - "Describe animation quality (smooth, bouncy, blur)"
+    - "Use 'create a component' for single elements"
+    - "Create slots for user API keys, never hardcode"
+
+  dont:
+    - "Don't use technical implementation details (useState, CSS classes)"
+    - "Don't write API keys or tokens in prompts"
+    - "Don't be overly prescriptive about code structure"
+    - "Don't skip describing the user experience flow"
+    - "Don't forget to specify mobile vs desktop optimization"
+
+iterative_refinement:
+  follow_up_patterns:
+    visual_polish:
+      - "Can you add a transparent gradient reflection faux-shine effect?"
+      - "The gradient shine should be fairly dramatic with a pure white streak"
+      - "Let's create a statically animated gradient tied to mouse position"
+
+    interaction_tuning:
+      - "The animation's direction should correspond to the user's mouse position"
+      - "As the user moves their mouse, it should change the animation progress"
+      - "Make the tilt proportional to distance from center"
+
+    layout_adjustments:
+      - "Let's optimize for mobile with a touch-friendly interface"
+      - "Use single column layout for mobile"
+      - "Progressive onboarding through guided steps"
+
+apple_quality_indicators:
+  motion:
+    - "Smooth and a little bouncy" (spring physics feel)
+    - "200ms easing out" (snappy responsiveness)
+    - "Subtle 1px blur" (motion blur for smoothness)
+    - "Interruptible animations" (responsive to user input)
+
+  visual_hierarchy:
+    - "Clean visual hierarchy with clear CTAs"
+    - "Avoid gradients" (unless strategically used for depth)
+    - "Large sans-serif type" (readability focus)
+    - "Minimal, modern, dark-mode" (refined aesthetic)
+
+  interaction_quality:
+    - "Touch-friendly interface" (44px+ hit targets)
+    - "Progressive onboarding" (gradual complexity reveal)
+    - "Real-time calculation/feedback" (immediate response)
+    - "Context preservation during transitions" (spatial understanding)
+
+css_light_dark_pattern:
+  description: "Dynamic color theming with CSS color-scheme"
+  implementation: |
+    When describing color systems, mention:
+    "The interface should support both light and dark modes. Use CSS color-scheme
+    to automatically adapt system colors, with custom theme overrides for brand colors."
+
+  example_language:
+    - "Support light and dark modes with automatic color adaptation"
+    - "Theme-aware colors that respect system preferences"
+    - "Use light-dark() CSS function for dynamic color values"
