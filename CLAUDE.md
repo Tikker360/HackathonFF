@@ -7,7 +7,7 @@
 | `/handoff` | Save session state for later continuation |
 | `/pickup` | Resume from a handoff document |
 
-**Version Control:** Sapling SCM (`sl` commands, never `git`)
+**Version Control:** Git
 **Repo:** https://github.com/Tikker360/HackathonFF.git
 
 ## Stack
@@ -16,7 +16,7 @@
 - **Database:** Supabase (auth, database, realtime)
 - **Styling:** Tailwind CSS v4
 - **Hosting:** Vercel
-- **SCM:** Sapling (`sl` commands, never `git`)
+- **SCM:** Git
 
 ## Directory Guide
 
@@ -31,9 +31,7 @@
 ## Non-Negotiables
 
 **Version Control:**
-- Always use `sl` (Sapling), never `git`
-- One bookmark = one feature (atomic commits)
-- No commits without an active bookmark
+- Use feature branches (one branch = one feature)
 - No force push to main
 
 **Code Quality:**
