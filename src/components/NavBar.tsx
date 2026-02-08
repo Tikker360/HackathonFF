@@ -101,7 +101,7 @@ export default function NavBar() {
               </span>
             </div>
           )}
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-2 py-1.5 rounded-lg hover:bg-zinc-800/50"
@@ -109,6 +109,13 @@ export default function NavBar() {
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Logout</span>
             </button>
+          ) : (
+            <Link
+              href="/login"
+              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20"
+            >
+              Sign in
+            </Link>
           )}
         </div>
       </div>
