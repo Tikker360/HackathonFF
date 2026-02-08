@@ -83,7 +83,32 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+
+    // Subscribe to realtime changes on holdings and profiles
+    // so the leaderboard updates live when trades happen
+    const channel = supabase
+      .channel("leaderboard-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "holdings" },
+        () => fetchData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles" },
+        () => fetchData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "transactions" },
+        () => fetchData()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchData, supabase]);
 
   const currentUserEntry = useMemo(
     () => rankings.find((r) => r.id === currentUserId),
