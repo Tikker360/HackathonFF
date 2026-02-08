@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Briefcase, Store, Trophy } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Briefcase, Store, Trophy, LogOut, Wallet } from "lucide-react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const NAV_LINKS = [
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
@@ -12,6 +14,49 @@ const NAV_LINKS = [
 
 export default function NavBar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+  const [cashBalance, setCashBalance] = useState<number | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const fetchUser = useCallback(async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      setIsLoggedIn(true);
+      const { data } = await supabase
+        .from("profiles")
+        .select("cash_balance")
+        .eq("id", user.id)
+        .single();
+      if (data) setCashBalance(data.cash_balance);
+    } else {
+      setIsLoggedIn(false);
+      setCashBalance(null);
+    }
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchUser();
+
+    // Re-fetch when auth state changes or when navigating
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => fetchUser());
+
+    return () => subscription.unsubscribe();
+  }, [supabase, fetchUser]);
+
+  // Refetch cash when navigating between pages (catches trades)
+  useEffect(() => {
+    fetchUser();
+  }, [pathname, fetchUser]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   // Hide on login page
   if (pathname === "/login") return null;
@@ -45,6 +90,26 @@ export default function NavBar() {
               </Link>
             );
           })}
+        </div>
+
+        <div className="flex items-center gap-3">
+          {cashBalance !== null && (
+            <div className="flex items-center gap-1.5 text-sm text-zinc-400">
+              <Wallet className="w-3.5 h-3.5" />
+              <span className="font-semibold text-zinc-200">
+                ${cashBalance.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </span>
+            </div>
+          )}
+          {isLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-2 py-1.5 rounded-lg hover:bg-zinc-800/50"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          )}
         </div>
       </div>
     </nav>

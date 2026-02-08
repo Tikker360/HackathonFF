@@ -37,6 +37,12 @@ yarn-error.log*
 .claude/handoffs/*
 !.claude/handoffs/.gitignore
 
+# magicpath generated subproject
+buylow/
+
+# supabase
+supabase/.temp/
+
 # vercel
 .vercel
 
