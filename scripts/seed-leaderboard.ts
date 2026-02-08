@@ -294,22 +294,22 @@ const SCENARIOS: UserScenario[] = [
       { player: "Trey McBride", quantity: 3, avgPrice: 390 },
     ],
   },
-  // #19 Triple Tie B — cash adjusted to force $10,210 total
+  // #19 Triple Tie B — naturally ties at $10,210 (gain = 1×50 + 4×40 = 210)
   {
     teamName: "Coincidence B",
-    cashBalance: 8210,
+    cashBalance: 7630, // 10000 - 490 - 1880
     holdings: [
-      { player: "Amon-Ra St. Brown", quantity: 2, avgPrice: 555 },
-      { player: "Sam LaPorta", quantity: 2, avgPrice: 420 },
+      { player: "De'Von Achane", quantity: 1, avgPrice: 490 },
+      { player: "Malik Nabers", quantity: 4, avgPrice: 470 },
     ],
   },
-  // #20 Triple Tie C — cash adjusted to force $10,210 total
+  // #20 Triple Tie C — naturally ties at $10,210 (gain = 3×20 + 3×50 = 210)
   {
     teamName: "Coincidence C",
-    cashBalance: 8110,
+    cashBalance: 6760, // 10000 - 1440 - 1800
     holdings: [
-      { player: "De'Von Achane", quantity: 2, avgPrice: 490 },
-      { player: "Malik Nabers", quantity: 2, avgPrice: 470 },
+      { player: "Travis Kelce", quantity: 3, avgPrice: 480 },
+      { player: "Bijan Robinson", quantity: 3, avgPrice: 600 },
     ],
   },
 ];
@@ -419,8 +419,9 @@ async function main() {
       console.error(`   Failed to update profile for ${scenario.teamName}:`, profileError.message);
     }
 
-    // Clear existing holdings for this user (in case of re-run)
+    // Clear existing holdings and transactions for this user (in case of re-run)
     await supabase.from("holdings").delete().eq("user_id", userId);
+    await supabase.from("transactions").delete().eq("user_id", userId);
 
     // Insert holdings
     for (const h of scenario.holdings) {
@@ -460,6 +461,11 @@ async function main() {
       for (const tx of scenario.transactionsToday) {
         const player = players[tx.player];
         if (!player) continue;
+        // Use today's date in the Supabase project timezone (UTC),
+        // spreading transactions across morning hours to avoid crossing midnight
+        const todayBase = new Date();
+        todayBase.setUTCHours(12 + Math.floor(Math.random() * 4), Math.floor(Math.random() * 60), 0, 0);
+
         await supabase.from("transactions").insert({
           user_id: userId,
           player_id: player.id,
@@ -467,10 +473,7 @@ async function main() {
           quantity: tx.quantity,
           price_per_share: tx.price,
           total_price: tx.quantity * tx.price,
-          // Spread today's transactions across the last few hours
-          created_at: new Date(
-            Date.now() - Math.floor(Math.random() * 4 * 60 * 60 * 1000)
-          ).toISOString(),
+          created_at: todayBase.toISOString(),
         });
       }
     }
